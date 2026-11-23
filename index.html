@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#121316" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="N_wp" />
+  <title>N_wp · 근무 · 연차 · 급여 관제</title>
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="./icon.svg" />
+  <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png" />
+  <link rel="apple-touch-icon" href="./icon-192.png" />
+  <link rel="stylesheet" href="./tokens.css" />
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <main id="appShell" class="app-shell">
+    <!-- Focal 1: 상단 제어 바 (1px Warm Rim-Light) -->
+    <header id="topBarFocal" class="top-bar rim-focal" data-thermal="calm">
+      <div class="brand-wrap">
+        <div class="brand-title-row">
+          <span id="liveEmberDot" class="ember-dot" data-thermal="calm" data-live="false" aria-hidden="true"></span>
+          <h1 class="brand-title">N_wp 근무·급여 관제</h1>
+        </div>
+        <span id="syncMeta" class="sync-meta">인증 대기 중</span>
+      </div>
+      <div class="top-actions">
+        <button id="toggleConfigBtn" class="btn" type="button">연결 설정</button>
+        <button id="refreshBtn" class="btn btn-primary" type="button">동기화</button>
+      </div>
+    </header>
+
+    <div id="errorToast" class="error-toast" hidden></div>
+
+    <section id="alertBanner" class="alert-banner" role="status" aria-live="polite">
+      <div class="alert-banner-lead">
+        <span id="bannerEmberDot" class="ember-dot" data-thermal="calm" data-live="false" aria-hidden="true"></span>
+        <span id="alertBannerText">연결 대기 중</span>
+      </div>
+      <span id="alertBadge" class="banner-badge">대기</span>
+    </section>
+
+    <!-- 카드 1: 유급휴가 및 반차 FIFO -->
+    <section class="card" aria-labelledby="leaveCardTitle">
+      <div class="card-header">
+        <h2 id="leaveCardTitle" class="card-title">유급휴가 및 반차 FIFO</h2>
+        <span class="card-sub">연차 리셋 6월 1일</span>
+      </div>
+      <div class="metrics-grid">
+        <div class="metric-box">
+          <span class="metric-label">잔여 연차</span>
+          <strong id="valRemainingLeave" class="metric-value is-gold">-</strong>
+        </div>
+        <div class="metric-box">
+          <span class="metric-label">사용 연차 (확정 / 가집계)</span>
+          <strong id="valUsedLeave" class="metric-value">-</strong>
+        </div>
+        <div class="metric-box">
+          <span class="metric-label">미매칭 반차 만료기한</span>
+          <strong id="valPendingDeadline" class="metric-value">-</strong>
+        </div>
+      </div>
+    </section>
+
+    <!-- Focal 2: 이번 달 근무 및 잔업 효율 (1px Warm Rim-Light) -->
+    <section id="workCardFocal" class="card rim-focal" data-thermal="calm" aria-labelledby="workCardTitle">
+      <div class="card-header">
+        <h2 id="workCardTitle" class="card-title">이번 달 근무 및 잔업 효율</h2>
+        <span id="valTargetMonth" class="card-sub">-</span>
+      </div>
+      <div class="metrics-grid">
+        <div class="metric-box">
+          <span class="metric-label">월 누적 잔업</span>
+          <strong id="valMtdOvertime" class="metric-value">-</strong>
+        </div>
+        <div class="metric-box">
+          <span class="metric-label">순시간당 잔업 효율</span>
+          <strong id="valOtEfficiency" class="metric-value is-gold">-</strong>
+        </div>
+        <div class="metric-box">
+          <span class="metric-label">실근로 시간</span>
+          <strong id="valActualWork" class="metric-value">-</strong>
+        </div>
+      </div>
+      <div class="trigger-pills">
+        <div id="pillT1" class="trigger-pill"><span>T1 반차 기한</span><span>대기</span></div>
+        <div id="pillT2" class="trigger-pill"><span>T2 4~6월 보수</span><span>대기</span></div>
+        <div id="pillT34" class="trigger-pill"><span>T3/T4 연차·잔업</span><span>대기</span></div>
+      </div>
+    </section>
+
+    <!-- 카드 3: 예상 실수령액 및 사회보험 등급 -->
+    <section class="card" aria-labelledby="payCardTitle">
+      <div class="card-header">
+        <h2 id="payCardTitle" class="card-title">예상 실수령액 및 사회보험 구간</h2>
+        <span id="valBaseSalarySub" class="card-sub">기본급 - 엔</span>
+      </div>
+      <div class="metrics-grid">
+        <div class="metric-box">
+          <span class="metric-label">예상 실수령액</span>
+          <strong id="valEstNetPay" class="metric-value is-gold">-</strong>
+        </div>
+        <div class="metric-box">
+          <span class="metric-label">4~6월 평균 총지급</span>
+          <strong id="valAprJunAvg" class="metric-value">-</strong>
+        </div>
+        <div class="metric-box">
+          <span class="metric-label">다음 등급 90% 기준</span>
+          <strong id="valGradeThreshold" class="metric-value">-</strong>
+        </div>
+      </div>
+    </section>
+
+    <!-- 카드 4: 월별 필라멘트 스플라인 추이 차트 -->
+    <section class="card" aria-labelledby="chartCardTitle">
+      <div class="card-header chart-card-header">
+        <h2 id="chartCardTitle" class="card-title">월별 급여·잔업 추이</h2>
+        <div class="segmented-track" role="tablist" aria-label="차트 지표 선택">
+          <button class="seg-btn is-active" type="button" role="tab" aria-selected="true" data-chart-metric="net">실수령</button>
+          <button class="seg-btn" type="button" role="tab" aria-selected="false" data-chart-metric="ot">잔업</button>
+          <button class="seg-btn" type="button" role="tab" aria-selected="false" data-chart-metric="eff">효율</button>
+        </div>
+      </div>
+      <div id="chartViewport" class="chart-viewport">
+        <svg id="trendChartSvg" class="trend-chart-svg" viewBox="0 0 640 200" preserveAspectRatio="none" aria-label="월별 추이 차트">
+          <defs>
+            <linearGradient id="filamentLineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" class="grad-stop-gold" />
+              <stop offset="55%" class="grad-stop-orange" />
+              <stop offset="100%" class="grad-stop-red" />
+            </linearGradient>
+            <linearGradient id="filamentAreaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" class="grad-area-top" />
+              <stop offset="100%" class="grad-area-bottom" />
+            </linearGradient>
+          </defs>
+          <g id="chartGridGroup"></g>
+          <path id="chartAreaPath" class="chart-area-path" d="" />
+          <path id="chartLinePath" class="chart-line-path" d="" />
+          <line id="chartHoverHairline" class="chart-hover-hairline" x1="0" y1="0" x2="0" y2="0" hidden />
+          <g id="chartPointsGroup"></g>
+        </svg>
+        <div id="chartTooltip" class="chart-tooltip" hidden></div>
+        <div id="chartEmptyState" class="chart-empty">표시할 월별 데이터가 없습니다</div>
+      </div>
+      <div id="chartAxisLabels" class="chart-axis-labels"></div>
+    </section>
+
+    <!-- 카드 5: Gemini 원탭 상담 컨텍스트 -->
+    <section class="card" aria-labelledby="aiCardTitle">
+      <div class="card-header">
+        <h2 id="aiCardTitle" class="card-title">Gemini 상담용 요약 블록</h2>
+        <button id="copyAiBtn" class="btn btn-primary" type="button">프롬프트 복사</button>
+      </div>
+      <div id="aiContextText" class="ai-context-box">-</div>
+    </section>
+
+    <!-- 카드 6: 월별 급여·근무 아카이브 -->
+    <section class="card" aria-labelledby="archiveCardTitle">
+      <div class="card-header">
+        <h2 id="archiveCardTitle" class="card-title">월별 급여 및 근무 이력</h2>
+        <span id="archiveCount" class="card-sub">0개월</span>
+      </div>
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>대상 월</th>
+              <th>실근로 (h)</th>
+              <th>잔업 (h)</th>
+              <th>과세 총액</th>
+              <th>예상 실수령</th>
+              <th>잔업 효율</th>
+              <th>월집계 검증</th>
+              <th>상태</th>
+            </tr>
+          </thead>
+          <tbody id="archiveTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 카드 7: 반차 2개월 FIFO 이력 -->
+    <section class="card" aria-labelledby="fifoCardTitle">
+      <div class="card-header">
+        <h2 id="fifoCardTitle" class="card-title">반차 2개월 FIFO 이력</h2>
+        <span id="fifoCount" class="card-sub">0건</span>
+      </div>
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>사용일</th>
+              <th>2개월 만료일</th>
+              <th>FIFO 상태</th>
+              <th>매칭일</th>
+              <th>잔여 기한</th>
+              <th>급여 반영</th>
+            </tr>
+          </thead>
+          <tbody id="fifoTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- 보안 잠금 / API 연결 모달 (Darkroom Filament Overlay Spec) -->
+  <div id="authBackdrop" class="auth-backdrop" role="dialog" aria-modal="true" aria-labelledby="authModalTitle">
+    <form id="authForm" class="auth-modal" novalidate>
+      <div class="auth-modal-header">
+        <div class="brand-title-row">
+          <span class="ember-dot" data-thermal="active" data-live="false" aria-hidden="true"></span>
+          <h2 id="authModalTitle" class="auth-modal-title">N_wp 보안 잠금</h2>
+        </div>
+        <button id="closeModalBtn" class="btn" type="button" hidden>닫기</button>
+      </div>
+      <p class="auth-modal-desc">Apps Script 웹 앱 URL과 비밀키(PIN)를 입력하면 이 브라우저에만 저장된 뒤 대시보드를 불러옵니다</p>
+
+      <div id="authErrorBox" class="auth-error-box" hidden></div>
+
+      <div class="field-group">
+        <label class="field-label" for="apiUrlInput">Apps Script 웹 앱 URL</label>
+        <input
+          id="apiUrlInput"
+          class="field-input"
+          type="url"
+          autocomplete="off"
+          spellcheck="false"
+          placeholder="https://script.google.com/macros/s/.../exec"
+          required
+        />
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="pinInput">비밀키 (PIN)</label>
+        <input
+          id="pinInput"
+          class="field-input"
+          type="password"
+          inputmode="numeric"
+          autocomplete="current-password"
+          placeholder="비밀키(PIN) 입력"
+          required
+        />
+      </div>
+
+      <div class="auth-modal-actions">
+        <button id="unlockBtn" class="btn btn-primary" type="submit">잠금 해제 및 연결</button>
+        <button id="logoutBtn" class="btn btn-danger-ghost" type="button" hidden>초기화 (로그아웃)</button>
+      </div>
+      <p class="config-hint">인증 정보는 서버나 코드에 저장되지 않으며 브라우저 localStorage에만 보관됩니다</p>
+    </form>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>

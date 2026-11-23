@@ -1,0 +1,112 @@
+/* ==========================================================================
+   Darkroom Filament v1.1 — Canonical Design Tokens (:root)
+   Quiet Pro: 92% Deep Dark Gray Monochrome + 8% Thermal Filament Spectrum
+   순흑·순백 배제 · #08090C 알파 섀도우 · 화이트 알파 스페큘러 헤어라인
+   ========================================================================== */
+
+:root {
+  /* A. Surface Hierarchy (5) */
+  --bg-inset: #0E0F12;
+  --bg-canvas: #121316;
+  --bg-sidebar: #15161A;
+  --bg-surface: #18191D;
+  --bg-elevated: #1E2026;
+
+  /* B. Specular Hairlines & 1px Warm Rim-Light (8) */
+  --border-subtle: rgba(255, 255, 255, 0.04);
+  --border-specular: rgba(255, 255, 255, 0.07);
+  --border-specular-strong: rgba(255, 255, 255, 0.12);
+  --rim-gold: rgba(246, 196, 83, 0.45);
+  --rim-orange: rgba(240, 110, 53, 0.28);
+  --rim-red: rgba(229, 72, 77, 0.36);
+  --rim-wash: rgba(246, 196, 83, 0.05);
+  --rim-center-default: 0.50;
+
+  /* C. Thermal Filament Spectrum & Semantic Accents (14) */
+  --filament-gold: #F6C453;
+  --filament-orange: #F06E35;
+  --filament-orange-text: #F48C5E;
+  --filament-red: #E5484D;
+  --ember-core: #FFF5DC;
+  --filament-gold-bg: rgba(246, 196, 83, 0.12);
+  --filament-gold-border: rgba(246, 196, 83, 0.28);
+  --filament-orange-bg: rgba(240, 110, 53, 0.14);
+  --filament-orange-border: rgba(240, 110, 53, 0.30);
+  --filament-red-bg: rgba(229, 72, 77, 0.14);
+  --filament-red-border: rgba(229, 72, 77, 0.30);
+  --filament-neutral-bg: rgba(255, 255, 255, 0.06);
+  --filament-neutral-border: rgba(255, 255, 255, 0.10);
+  --status-danger-text: #FCA5A5;
+
+  /* D. CTA, Ghost & Typography Colors (10) */
+  --cta-bg: #F2F3F5;
+  --cta-hover: #E6E8EC;
+  --cta-pressed: #D8DBE0;
+  --cta-text: #121316;
+  --btn-ghost-bg: rgba(255, 255, 255, 0.04);
+  --btn-ghost-hover: rgba(255, 255, 255, 0.08);
+  --text-primary: #F2F3F5;
+  --text-secondary: #9EA3AE;
+  --text-muted: #848A96;
+  --text-disabled: #50545E;
+
+  /* E. Shadows & Backdrop (3) */
+  --shadow-floating: 0 12px 32px rgba(8, 9, 12, 0.55), 0 2px 6px rgba(8, 9, 12, 0.35);
+  --shadow-card: 0 4px 16px rgba(8, 9, 12, 0.35);
+  --backdrop-palette: rgba(8, 9, 12, 0.68);
+
+  /* F. Typography Families & Concrete Scale (14) */
+  --font-sans: "Inter", "Pretendard", "Segoe UI", "Malgun Gothic", sans-serif;
+  --font-mono: "JetBrains Mono", "Cascadia Mono", "Consolas", monospace;
+
+  --text-editorial: 26px;
+  --text-metric: 24px;
+  --text-card-title: 14px;
+  --text-body: 13px;
+  --text-badge: 12px;
+  --text-micro: 11px;
+
+  --lh-editorial: 32px;
+  --lh-metric: 28px;
+  --lh-card-title: 20px;
+  --lh-body: 18px;
+  --lh-badge: 16px;
+  --lh-micro: 14px;
+
+  /* G. Spacing Scale (7) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  /* H. Soft Architectural Radius (7) */
+  --radius-scroll: 3px;
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-item: 10px;
+  --radius-modal: 14px;
+  --radius-card: 16px;
+  --radius-pill: 999px;
+
+  /* I. Breakpoints (4) */
+  --bp-min: 760px;
+  --bp-standard: 960px;
+  --bp-wide: 1360px;
+  --bp-content-max: 1120px;
+
+  /* J. Fluid Darkroom Optics Motion & Easing (10) */
+  --motion-fast: 120ms;
+  --motion-base: 160ms;
+  --motion-overlay: 220ms;
+  --motion-optic: 320ms;
+  --motion-rim-track: 160ms;
+  --motion-rim-decay: 360ms;
+  --motion-breath: 3200ms;
+
+  --ease-cubic: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-overlay: cubic-bezier(0.16, 1, 0.3, 1);
+}
