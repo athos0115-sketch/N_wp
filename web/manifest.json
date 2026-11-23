@@ -1,0 +1,32 @@
+{
+  "name": "N_wp · 근무 · 연차 · 급여 관제",
+  "short_name": "N_wp",
+  "description": "개인 근무·유급휴가·급여 효율 관제 대시보드",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#121316",
+  "theme_color": "#121316",
+  "lang": "ko",
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+.env
+.env.*
+apps_script/
+GEMINI.md
+README.md
+serve_web.ps1
+*.log
+.DS_Store
+Thumbs.db

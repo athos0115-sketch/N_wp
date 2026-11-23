@@ -1,0 +1,905 @@
+@import url('./tokens.css');
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  line-height: var(--lh-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+.app-shell {
+  width: 100%;
+  max-width: var(--bp-min);
+  margin: 0 auto;
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* ============================================================================
+   1px Warm Rim-Light (Strict Max 2 Focal Elements: .top-bar & .card--focal)
+   ========================================================================== */
+.rim-focal {
+  position: relative;
+  overflow: hidden;
+  --rim-x: 50%;
+}
+
+.rim-focal::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    var(--border-specular) 0%,
+    var(--rim-gold) calc(var(--rim-x) - 18%),
+    var(--rim-orange) calc(var(--rim-x) + 12%),
+    var(--border-specular) 82%
+  );
+  transition: opacity var(--motion-rim-decay) var(--ease-cubic);
+}
+
+.rim-focal::after {
+  content: "";
+  position: absolute;
+  top: 1px;
+  left: 0;
+  right: 0;
+  height: var(--space-6);
+  pointer-events: none;
+  background: linear-gradient(180deg, var(--rim-wash) 0%, transparent 100%);
+}
+
+.rim-focal[data-thermal="peak"]::before {
+  background: linear-gradient(
+    90deg,
+    var(--border-specular) 0%,
+    var(--rim-orange) calc(var(--rim-x) - 18%),
+    var(--rim-red) calc(var(--rim-x) + 12%),
+    var(--border-specular) 82%
+  );
+}
+
+/* ============================================================================
+   Top Control Bar
+   ========================================================================== */
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-specular);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-floating);
+}
+
+.brand-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.brand-title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.brand-title {
+  margin: 0;
+  font-size: var(--text-card-title);
+  line-height: var(--lh-card-title);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.sync-meta {
+  font-size: var(--text-micro);
+  line-height: var(--lh-micro);
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.top-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+/* ============================================================================
+   Ember Core Dot (Thermal Coupling & Halo-only 3200ms Breathing)
+   ========================================================================== */
+.ember-dot {
+  position: relative;
+  width: var(--space-2);
+  height: var(--space-2);
+  border-radius: var(--radius-pill);
+  flex-shrink: 0;
+  background: radial-gradient(circle, var(--ember-core) 0%, var(--filament-gold) 65%, var(--filament-orange) 100%);
+}
+
+.ember-dot::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: var(--radius-pill);
+  background: radial-gradient(circle, var(--filament-gold-border) 0%, transparent 72%);
+  opacity: 0.75;
+  pointer-events: none;
+}
+
+.ember-dot[data-thermal="active"] {
+  background: radial-gradient(circle, var(--ember-core) 0%, var(--filament-orange) 65%, var(--filament-red) 100%);
+}
+
+.ember-dot[data-thermal="active"]::after {
+  background: radial-gradient(circle, var(--filament-orange-border) 0%, transparent 72%);
+}
+
+.ember-dot[data-thermal="peak"] {
+  background: radial-gradient(circle, var(--ember-core) 0%, var(--filament-red) 70%, var(--filament-orange) 100%);
+}
+
+.ember-dot[data-thermal="peak"]::after {
+  background: radial-gradient(circle, var(--filament-red-border) 0%, transparent 72%);
+}
+
+.ember-dot[data-live="true"]::after {
+  animation: ember-breath var(--motion-breath) ease-in-out infinite;
+}
+
+@keyframes ember-breath {
+  0%, 100% {
+    opacity: 0.55;
+    transform: scale(0.94);
+  }
+  50% {
+    opacity: 0.95;
+    transform: scale(1.08);
+  }
+}
+
+/* ============================================================================
+   7-State Controls (CTA Off-White Pill & Ghost Glass Pill)
+   ========================================================================== */
+.btn {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  border: 1px solid var(--border-specular);
+  background-color: var(--btn-ghost-bg);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: var(--text-badge);
+  line-height: var(--lh-badge);
+  font-weight: 500;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition:
+    background-color var(--motion-fast) var(--ease-cubic),
+    border-color var(--motion-fast) var(--ease-cubic),
+    color var(--motion-fast) var(--ease-cubic),
+    transform var(--motion-fast) var(--ease-cubic);
+}
+
+.btn:hover:not(:disabled) {
+  background-color: var(--btn-ghost-hover);
+  border-color: var(--border-specular-strong);
+}
+
+.btn:active:not(:disabled) {
+  background-color: var(--bg-elevated);
+  transform: translateY(1px);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--filament-orange);
+  outline-offset: 2px;
+}
+
+.btn:disabled {
+  background-color: var(--bg-inset);
+  border-color: var(--border-subtle);
+  color: var(--text-disabled);
+  cursor: default;
+}
+
+.btn-primary {
+  background-color: var(--cta-bg);
+  border-color: var(--cta-bg);
+  color: var(--cta-text);
+  font-weight: 600;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--cta-hover);
+  border-color: var(--cta-hover);
+}
+
+.btn-primary:active:not(:disabled) {
+  background-color: var(--cta-pressed);
+  border-color: var(--cta-pressed);
+  transform: scale(0.985);
+}
+
+/* ============================================================================
+   Security Lock & Connection Modal (No Warm Rim-Light per UI_darkroom Spec)
+   ========================================================================== */
+.app-shell.is-locked {
+  filter: blur(6px);
+  pointer-events: none;
+  user-select: none;
+}
+
+.auth-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background-color: var(--backdrop-palette);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+}
+
+.auth-backdrop[hidden] {
+  display: none;
+}
+
+.auth-modal {
+  width: 100%;
+  max-width: 440px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-specular);
+  border-radius: var(--radius-modal);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-floating);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.auth-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.auth-modal-title {
+  margin: 0;
+  font-size: var(--text-card-title);
+  line-height: var(--lh-card-title);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.auth-modal-desc {
+  margin: 0;
+  font-size: var(--text-badge);
+  line-height: var(--lh-body);
+  color: var(--text-secondary);
+}
+
+.auth-error-box {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  background-color: var(--filament-red-bg);
+  border: 1px solid var(--filament-red-border);
+  color: var(--status-danger-text);
+  font-size: var(--text-badge);
+  line-height: var(--lh-badge);
+}
+
+.auth-error-box[hidden] {
+  display: none;
+}
+
+.field-input.is-error {
+  border-color: var(--filament-red-border);
+}
+
+.field-input.is-error:focus-visible {
+  outline: 2px solid var(--filament-red);
+  outline-offset: 2px;
+}
+
+.auth-modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding-top: var(--space-1);
+}
+
+.btn-danger-ghost {
+  border-color: var(--filament-red-border);
+  background-color: var(--filament-red-bg);
+  color: var(--status-danger-text);
+}
+
+.btn-danger-ghost:hover:not(:disabled) {
+  border-color: var(--filament-red);
+  background-color: var(--filament-red-bg);
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.field-label {
+  font-size: var(--text-badge);
+  line-height: var(--lh-badge);
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.field-input,
+.field-select {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  background-color: var(--bg-inset);
+  color: var(--text-primary);
+  border: 1px solid var(--border-specular);
+  border-radius: var(--radius-item);
+  font-family: var(--font-mono);
+  font-size: var(--text-badge);
+  line-height: var(--lh-badge);
+  transition: border-color var(--motion-fast) var(--ease-cubic);
+}
+
+.field-input:hover,
+.field-select:hover {
+  border-color: var(--border-specular-strong);
+}
+
+.field-input:focus-visible,
+.field-select:focus-visible {
+  outline: 2px solid var(--filament-orange);
+  outline-offset: 2px;
+}
+
+.config-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.config-hint {
+  margin: 0;
+  font-size: var(--text-micro);
+  line-height: var(--lh-micro);
+  color: var(--text-muted);
+}
+
+/* ============================================================================
+   Status & Error Feedback (92% Monochrome + 8% Filament Spectrum)
+   ========================================================================== */
+.error-toast {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  background-color: var(--filament-red-bg);
+  border: 1px solid var(--filament-red-border);
+  color: var(--status-danger-text);
+  font-size: var(--text-badge);
+  line-height: var(--lh-badge);
+}
+
+.error-toast[hidden] {
+  display: none;
+}
+
+.alert-banner {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-card);
+  border: 1px solid var(--filament-gold-border);
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+  font-size: var(--text-body);
+  line-height: var(--lh-body);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  box-shadow: var(--shadow-card);
+}
+
+.alert-banner-lead {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.alert-banner.is-alert {
+  border-color: var(--filament-red-border);
+  background-color: var(--filament-red-bg);
+  color: var(--status-danger-text);
+}
+
+.banner-badge {
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  line-height: var(--lh-micro);
+  font-weight: 500;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--filament-gold-border);
+  background-color: var(--filament-gold-bg);
+  color: var(--filament-gold);
+  flex-shrink: 0;
+}
+
+.alert-banner.is-alert .banner-badge {
+  border-color: var(--filament-red-border);
+  background-color: var(--filament-red-bg);
+  color: var(--status-danger-text);
+}
+
+/* ============================================================================
+   Cards (Nested Radius: Card 16px - Padding 16px -> Inner 8px)
+   ========================================================================== */
+.card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-specular);
+  border-radius: var(--radius-card);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.card-title {
+  margin: 0;
+  font-size: var(--text-card-title);
+  line-height: var(--lh-card-title);
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.card-sub {
+  font-size: var(--text-micro);
+  line-height: var(--lh-micro);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-2);
+}
+
+.metric-box {
+  background-color: var(--bg-inset);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.metric-label {
+  font-size: var(--text-micro);
+  line-height: var(--lh-micro);
+  color: var(--text-secondary);
+}
+
+.metric-value {
+  font-family: var(--font-mono);
+  font-size: var(--text-metric);
+  line-height: var(--lh-metric);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+  word-break: break-word;
+}
+
+.metric-value.is-gold {
+  color: var(--filament-gold);
+}
+
+.metric-value.is-warn {
+  color: var(--filament-orange-text);
+}
+
+.metric-value.is-alert {
+  color: var(--status-danger-text);
+}
+
+/* Trigger Pills */
+.trigger-pills {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-2);
+}
+
+.trigger-pill {
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  line-height: var(--lh-micro);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  background-color: var(--filament-neutral-bg);
+  border: 1px solid var(--filament-neutral-border);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.trigger-pill.is-alert {
+  background-color: var(--filament-red-bg);
+  border-color: var(--filament-red-border);
+  color: var(--status-danger-text);
+  font-weight: 500;
+}
+
+/* AI Context Block */
+.ai-context-box {
+  background-color: var(--bg-inset);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+  font-family: var(--font-mono);
+  font-size: var(--text-badge);
+  line-height: var(--lh-body);
+  color: var(--text-secondary);
+  word-break: break-word;
+}
+
+/* ============================================================================
+   Darkroom Filament SVG Bezier Spline Chart
+   ========================================================================== */
+.chart-card-header {
+  flex-wrap: wrap;
+}
+
+.segmented-track {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1);
+  background-color: var(--bg-inset);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-pill);
+}
+
+.seg-btn {
+  appearance: none;
+  border: 1px solid transparent;
+  background-color: transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: var(--text-micro);
+  line-height: var(--lh-micro);
+  font-weight: 500;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition:
+    background-color var(--motion-base) var(--ease-quart),
+    border-color var(--motion-base) var(--ease-quart),
+    color var(--motion-base) var(--ease-quart);
+}
+
+.seg-btn:hover {
+  color: var(--text-primary);
+}
+
+.seg-btn.is-active {
+  background-color: var(--bg-elevated);
+  border-color: var(--border-specular-strong);
+  color: var(--text-primary);
+}
+
+.seg-btn:focus-visible {
+  outline: 2px solid var(--filament-orange);
+  outline-offset: 2px;
+}
+
+.chart-viewport {
+  position: relative;
+  width: 100%;
+  height: 196px;
+  background-color: var(--bg-inset);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2);
+  overflow: hidden;
+  touch-action: pan-y;
+}
+
+.trend-chart-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.grad-stop-gold {
+  stop-color: var(--filament-gold);
+}
+
+.grad-stop-orange {
+  stop-color: var(--filament-orange);
+}
+
+.grad-stop-red {
+  stop-color: var(--filament-red);
+}
+
+.grad-area-top {
+  stop-color: var(--filament-orange-bg);
+}
+
+.grad-area-bottom {
+  stop-color: transparent;
+}
+
+.chart-grid-line {
+  stroke: var(--border-subtle);
+  stroke-width: 1;
+}
+
+.chart-grid-label {
+  fill: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+}
+
+.chart-area-path {
+  fill: url(#filamentAreaGrad);
+}
+
+.chart-line-path {
+  fill: none;
+  stroke: url(#filamentLineGrad);
+  stroke-width: 2.25;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.chart-hover-hairline {
+  stroke: var(--border-specular-strong);
+  stroke-width: 1;
+}
+
+.chart-point-halo {
+  fill: var(--filament-orange-bg);
+  opacity: 0;
+  transition: opacity var(--motion-fast) var(--ease-cubic);
+}
+
+.chart-point-node {
+  fill: var(--ember-core);
+  stroke: var(--filament-orange);
+  stroke-width: 2;
+  cursor: pointer;
+}
+
+.chart-point-node.is-active {
+  stroke: var(--filament-gold);
+  stroke-width: 2.5;
+}
+
+.chart-point-halo.is-active {
+  opacity: 1;
+}
+
+.chart-tooltip {
+  position: absolute;
+  top: var(--space-2);
+  left: 0;
+  pointer-events: none;
+  background-color: var(--bg-elevated);
+  border: 1px solid var(--border-specular-strong);
+  border-radius: var(--radius-xs);
+  padding: var(--space-1) var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  line-height: var(--lh-micro);
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+  white-space: nowrap;
+  box-shadow: var(--shadow-card);
+  transform: translateX(-50%);
+}
+
+.chart-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-badge);
+  color: var(--text-muted);
+}
+
+.chart-empty[hidden] {
+  display: none;
+}
+
+.chart-axis-labels {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  line-height: var(--lh-micro);
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+  padding: 0 var(--space-1);
+}
+
+/* ============================================================================
+   Tables & Minimalist Scrollbar
+   ========================================================================== */
+.table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  background-color: var(--bg-inset);
+}
+
+.table-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+
+.table-scroll::-webkit-scrollbar-track {
+  background-color: var(--bg-inset);
+}
+
+.table-scroll::-webkit-scrollbar-thumb {
+  background-color: var(--bg-elevated);
+  border-radius: var(--radius-scroll);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-badge);
+  line-height: var(--lh-badge);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.data-table th,
+.data-table td {
+  padding: var(--space-2) var(--space-3);
+  text-align: left;
+  border-bottom: 1px solid var(--border-subtle);
+  white-space: nowrap;
+}
+
+.data-table th {
+  background-color: var(--bg-elevated);
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.data-table tbody tr {
+  transition: background-color var(--motion-fast) var(--ease-cubic);
+}
+
+.data-table tbody tr:hover {
+  background-color: var(--bg-elevated);
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.status-tag {
+  display: inline-block;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-micro);
+  line-height: var(--lh-micro);
+  font-weight: 500;
+  border: 1px solid transparent;
+}
+
+.status-tag.is-ok {
+  background-color: var(--filament-gold-bg);
+  border-color: var(--filament-gold-border);
+  color: var(--filament-gold);
+}
+
+.status-tag.is-warn {
+  background-color: var(--filament-orange-bg);
+  border-color: var(--filament-orange-border);
+  color: var(--filament-orange-text);
+}
+
+.status-tag.is-alert {
+  background-color: var(--filament-red-bg);
+  border-color: var(--filament-red-border);
+  color: var(--status-danger-text);
+}
+
+/* ============================================================================
+   Responsive Layout (Galaxy Z Fold 8 Cover >=340px & Unfolded >=520px)
+   ========================================================================== */
+@media (min-width: 340px) {
+  .metrics-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .metrics-grid .metric-box:first-child {
+    grid-column: span 2;
+  }
+}
+
+@media (min-width: 520px) {
+  .app-shell {
+    padding: var(--space-5);
+    gap: var(--space-4);
+  }
+  .metrics-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .metrics-grid .metric-box:first-child {
+    grid-column: span 1;
+  }
+  .trigger-pills {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* Reduced Motion 1:1 Parity */
+@media (prefers-reduced-motion: reduce) {
+  .ember-dot[data-live="true"]::after {
+    animation: none;
+    opacity: 0.75;
+    transform: none;
+  }
+  .rim-focal::before,
+  .btn,
+  .field-input,
+  .field-select,
+  .data-table tbody tr {
+    transition-duration: 0ms;
+  }
+}
