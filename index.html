@@ -35,7 +35,17 @@
 
     <div id="errorToast" class="error-toast" hidden></div>
 
-    <section id="alertBanner" class="alert-banner" role="status" aria-live="polite">
+    <!-- 뷰 전환 네비게이션: 월별 관제 / 연간 분석 -->
+    <nav class="view-nav" aria-label="분석 뷰 전환">
+      <div class="segmented-track view-nav-track" role="tablist" aria-label="대시보드 뷰 선택">
+        <button id="tabMonthlyBtn" class="seg-btn is-active" type="button" role="tab" aria-selected="true" data-view-tab="monthly">월별 관제</button>
+        <button id="tabYearlyBtn" class="seg-btn" type="button" role="tab" aria-selected="false" data-view-tab="yearly">연간 분석</button>
+      </div>
+      <span id="viewPeriodMeta" class="card-sub">2022-09 ~ 현재</span>
+    </nav>
+
+    <div id="monthlyView" class="view-panel">
+      <section id="alertBanner" class="alert-banner" role="status" aria-live="polite">
       <div class="alert-banner-lead">
         <span id="bannerEmberDot" class="ember-dot" data-thermal="calm" data-live="false" aria-hidden="true"></span>
         <span id="alertBannerText">연결 대기 중</span>
@@ -124,6 +134,11 @@
           <button class="seg-btn" type="button" role="tab" aria-selected="false" data-chart-metric="eff">효율</button>
         </div>
       </div>
+      <div class="chart-filter-bar">
+        <div id="chartYearTrack" class="segmented-track chart-year-track" role="tablist" aria-label="차트 연도 선택">
+          <button class="seg-btn is-active" type="button" role="tab" aria-selected="true" data-chart-year="all">전체</button>
+        </div>
+      </div>
       <div id="chartViewport" class="chart-viewport">
         <svg id="trendChartSvg" class="trend-chart-svg" viewBox="0 0 640 200" preserveAspectRatio="none" aria-label="월별 추이 차트">
           <defs>
@@ -205,6 +220,111 @@
         </table>
       </div>
     </section>
+    </div>
+
+    <!-- [연간 분석] 뷰 (2022년 9월 ~ 현재) -->
+    <div id="yearlyView" class="view-panel" hidden>
+      <!-- Focal 2 (연간 뷰 활성 시): 전체 기간 누적 요약 -->
+      <section id="yearlyOverviewFocal" class="card rim-focal" data-thermal="calm" aria-labelledby="yearlyOverviewTitle">
+        <div class="card-header">
+          <h2 id="yearlyOverviewTitle" class="card-title">전체 기간 누적 요약</h2>
+          <span id="valYearlyPeriod" class="card-sub">-</span>
+        </div>
+        <div class="metrics-grid">
+          <div class="metric-box">
+            <span class="metric-label">누적 실근로 시간</span>
+            <strong id="valTotalWorkHours" class="metric-value">-</strong>
+          </div>
+          <div class="metric-box">
+            <span class="metric-label">누적 잔업 시간</span>
+            <strong id="valTotalOtHours" class="metric-value is-gold">-</strong>
+          </div>
+          <div class="metric-box">
+            <span class="metric-label">누적 추정 실수령액</span>
+            <strong id="valTotalNetPay" class="metric-value">-</strong>
+          </div>
+        </div>
+        <div class="trigger-pills">
+          <div class="trigger-pill"><span>집계 기간</span><span id="pillTotalMonths">-</span></div>
+          <div class="trigger-pill"><span>월평균 잔업</span><span id="pillAvgMonthlyOt">-</span></div>
+          <div class="trigger-pill"><span>평균 잔업 효율</span><span id="pillAvgOtEff">-</span></div>
+        </div>
+      </section>
+
+      <!-- 연간 차트: 연도별 잔업량 · 실근로 · 실수령 추이 -->
+      <section class="card" aria-labelledby="yearlyChartTitle">
+        <div class="card-header chart-card-header">
+          <h2 id="yearlyChartTitle" class="card-title">연도별 근무 · 잔업 추이</h2>
+          <div class="segmented-track" role="tablist" aria-label="연간 차트 지표 선택">
+            <button class="seg-btn is-active" type="button" role="tab" aria-selected="true" data-yearly-metric="ot">총 잔업</button>
+            <button class="seg-btn" type="button" role="tab" aria-selected="false" data-yearly-metric="work">총 실근로</button>
+            <button class="seg-btn" type="button" role="tab" aria-selected="false" data-yearly-metric="avgOt">월평균 잔업</button>
+            <button class="seg-btn" type="button" role="tab" aria-selected="false" data-yearly-metric="net">실수령 합계</button>
+          </div>
+        </div>
+        <div id="yearlyChartViewport" class="chart-viewport">
+          <svg id="yearlyChartSvg" class="trend-chart-svg" viewBox="0 0 640 200" preserveAspectRatio="none" aria-label="연도별 추이 그래프">
+            <defs>
+              <linearGradient id="yearlyLineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" class="grad-stop-gold" />
+                <stop offset="55%" class="grad-stop-orange" />
+                <stop offset="100%" class="grad-stop-red" />
+              </linearGradient>
+              <linearGradient id="yearlyAreaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" class="grad-area-top" />
+                <stop offset="100%" class="grad-area-bottom" />
+              </linearGradient>
+              <linearGradient id="yearlyBarGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" class="grad-bar-top" />
+                <stop offset="100%" class="grad-bar-bottom" />
+              </linearGradient>
+            </defs>
+            <g id="yearlyChartGridGroup"></g>
+            <g id="yearlyChartBarsGroup"></g>
+            <path id="yearlyChartAreaPath" class="chart-area-path yearly-area-path" d="" />
+            <path id="yearlyChartLinePath" class="chart-line-path yearly-line-path" d="" />
+            <line id="yearlyChartHoverHairline" class="chart-hover-hairline" x1="0" y1="0" x2="0" y2="0" hidden />
+            <g id="yearlyChartPointsGroup"></g>
+          </svg>
+          <div id="yearlyChartTooltip" class="chart-tooltip" hidden></div>
+          <div id="yearlyChartEmptyState" class="chart-empty">표시할 연간 데이터가 없습니다</div>
+        </div>
+        <div id="yearlyChartAxisLabels" class="chart-axis-labels"></div>
+      </section>
+
+      <!-- 연도별 요약 카드 리스트 -->
+      <section class="card" aria-labelledby="yearlyCardsTitle">
+        <div class="card-header">
+          <h2 id="yearlyCardsTitle" class="card-title">연도별 근무 · 급여 요약</h2>
+          <span id="yearlyCountSub" class="card-sub">0개년</span>
+        </div>
+        <div id="yearlyCardsGrid" class="yearly-cards-grid"></div>
+      </section>
+
+      <!-- 연차 사이클별 사용·소진 추이 (6월 1일 리셋 기준) -->
+      <section class="card" aria-labelledby="leaveCyclesTitle">
+        <div class="card-header">
+          <h2 id="leaveCyclesTitle" class="card-title">연차 사이클별 사용 · 소진 추이</h2>
+          <span class="card-sub">매년 6월 1일 리셋</span>
+        </div>
+        <div class="table-scroll">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>연차 사이클</th>
+                <th>전일 휴가</th>
+                <th>반차 사용</th>
+                <th>반차 매칭</th>
+                <th>만료</th>
+                <th>공식 소진</th>
+                <th>상태 / 잔여</th>
+              </tr>
+            </thead>
+            <tbody id="leaveCyclesTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
   </main>
 
   <!-- 보안 잠금 / API 연결 모달 (Darkroom Filament Overlay Spec) -->
